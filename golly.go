@@ -48,12 +48,12 @@ func (g *Golly) Run(f func() error) (err error) {
 		if nil == g.waitH {
 			return err
 		}
-		wait, err := g.waitH(g.failCount, err, g.failWait)
+		g.failWait, err = g.waitH(g.failCount, err, g.failWait)
 		if nil != err {
 			return err
 		}
-		if 0 < wait {
-			time.Sleep(wait)
+		if 0 < g.failWait {
+			time.Sleep(g.failWait)
 		}
 	}
 }
