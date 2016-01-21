@@ -44,16 +44,16 @@ func (g *Golly) Run(f func() error) (err error) {
 			g.failCount = 0
 			return nil
 		}
-		fmt.Println("ERROR", err)
 		g.failCount++
-		if nil != g.waitH {
-			wait, err := g.waitH(g.failCount, err, g.failWait)
-			if nil != err {
-				return err
-			}
-			if 0 < wait {
-				time.Sleep(wait)
-			}
+		if nil == g.waitH {
+			return err
+		}
+		wait, err := g.waitH(g.failCount, err, g.failWait)
+		if nil != err {
+			return err
+		}
+		if 0 < wait {
+			time.Sleep(wait)
 		}
 	}
 }
