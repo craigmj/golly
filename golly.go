@@ -7,10 +7,10 @@ import (
 
 type Golly struct {
 	panicH func(interface{}) error
-	waitH  func(n int, func(int, error, time.Duration) (time.Duration,error)
+	waitH  func(int, error, time.Duration) (time.Duration, error)
 
 	failCount int
-	failWait time.Duration
+	failWait  time.Duration
 }
 
 func New() *Golly {
@@ -22,7 +22,7 @@ func (g *Golly) Panic(p func(interface{}) error) *Golly {
 	return g
 }
 
-func (g *Golly) Retry(wait func (count int, err error, dur time.Duration) (time.Duration, error)) *Golly {
+func (g *Golly) Retry(wait func(count int, err error, dur time.Duration) (time.Duration, error)) *Golly {
 	g.waitH = wait
 	return g
 }
@@ -31,7 +31,7 @@ func (g *Golly) Run(f func() error) (err error) {
 	r := func() error {
 		if nil != g.panicH {
 			defer func() {
-				if e:=recover(); nil!=e {
+				if e := recover(); nil != e {
 					err = g.panicH(e)
 				}
 			}()
@@ -40,20 +40,20 @@ func (g *Golly) Run(f func() error) (err error) {
 	}
 	for {
 		err = r()
-		if nil==err {
+		if nil == err {
 			g.failCount = 0
 			return nil
 		}
+		fmt.Println("ERROR", err)
 		g.failCount++
-		if nil!=g.waitH {
+		if nil != g.waitH {
 			wait, err := g.waitH(g.failCount, err, g.failWait)
-			if nil!=err {
+			if nil != err {
 				return err
 			}
-			if 0<wait {
+			if 0 < wait {
 				time.Sleep(wait)
 			}
 		}
 	}
 }
-
