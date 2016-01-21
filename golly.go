@@ -1,7 +1,6 @@
 package golly
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -14,7 +13,19 @@ type Golly struct {
 }
 
 func New() *Golly {
-	return &Golly{}
+	return &Golly{
+		waitH: RetryWithBackoff,
+	}
+}
+
+func Panic(p func(interface{}) error) *Golly {
+	return New().Panic(p)
+}
+func Retry(p func(int, error, time.Duration) (time.Duration, error)) *Golly {
+	return New().Retry(p)
+}
+func Run(f func() error) error {
+	return New().Run(f)
 }
 
 func (g *Golly) Panic(p func(interface{}) error) *Golly {
