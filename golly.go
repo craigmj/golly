@@ -13,6 +13,7 @@ type Golly struct {
 	failWait time.Duration
 }
 
+// New returns a new golly struct appropriately configured.
 func New() *Golly {
 	return &Golly{}
 }
