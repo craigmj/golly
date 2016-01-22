@@ -6,7 +6,7 @@ import (
 
 type Golly struct {
 	panicH func(interface{}) error
-	retryH func(int, error, time.Duration) (time.Duration, error)
+	retryH func(error, int, time.Duration) (time.Duration, error)
 
 	failCount int
 	failWait  time.Duration
@@ -28,7 +28,7 @@ func Panic(p func(interface{}) error) *Golly {
 }
 
 // Retry creates a new Golly struct, and configures the retry handler.
-func Retry(p func(int, error, time.Duration) (time.Duration, error)) *Golly {
+func Retry(p func(error, int, time.Duration) (time.Duration, error)) *Golly {
 	return New().Retry(p)
 }
 
@@ -52,8 +52,8 @@ func (g *Golly) Panic(p func(interface{}) error) *Golly {
 // returns an error, golly's Run method returns the error. If it returns a nil
 // error and a time.Duration, golly will wait for the duration, then retry the
 // function.
-func (g *Golly) Retry(wait func(count int, err error, dur time.Duration) (time.Duration, error)) *Golly {
-	g.retryH = wait
+func (g *Golly) Retry(retry func(err error, errorCount int, lastWait time.Duration) (time.Duration, error)) *Golly {
+	g.retryH = retry
 	return g
 }
 
@@ -81,7 +81,7 @@ func (g *Golly) Run(f func() error) (err error) {
 		if nil == g.retryH {
 			return err
 		}
-		g.failWait, err = g.retryH(g.failCount, err, g.failWait)
+		g.failWait, err = g.retryH(err, g.failCount, g.failWait)
 		if nil != err {
 			return err
 		}

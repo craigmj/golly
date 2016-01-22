@@ -9,7 +9,7 @@ Golly is really simple, and short. It's a convenience, and there's no reason not
 	var db *sql.DB
 	mysqlConnection = "[connection-parameters]"
 
-	err = golly.Run(func() error) {
+	err = golly.Run(func() error {
 		db, err = sql.Open("mysql", mysqlConnection)
 		if nil!=err {
 			return err
@@ -24,7 +24,7 @@ This example will attempt to connect to the mysql server, and ping the server to
 
 Golly catches errors and handles retries through a retry handler. This is a function of the form:
 
-	func (failureCount int, err error, lastWait time.Duration) (time.Duration,error)
+	func (err error, failureCount int, lastWait time.Duration) (time.Duration,error)
 
 The retry handler returns the `time.Duration` that golly should wait before retrying (a negative or zero duration will cause golly to retry at once). If the retry handler doesn't want to retry, but rather to abort, return a non-nil error.
 
@@ -43,7 +43,7 @@ Golly has four methods:
 ## New() *Golly
 Returns a new Golly structure. Because golly defines a function for every 'method', you should never need to use the New(). The other golly functions automatically call a `New()` for you.
 
-## Retry(func (int,error,time.Duration) (time.Duration,error)) *Golly
+## Retry(func (error,int,time.Duration) (time.Duration,error)) *Golly
 Retry sets a Retry handler for the Golly struct. The retry handler returns determines whether to return an error, or retry after the returned duration has passed.
 
 ## Panic(func (interface{}) error) *Golly
