@@ -6,39 +6,60 @@ import (
 
 type Golly struct {
 	panicH func(interface{}) error
-	waitH  func(int, error, time.Duration) (time.Duration, error)
+	retryH func(int, error, time.Duration) (time.Duration, error)
 
 	failCount int
 	failWait  time.Duration
 }
 
-// New returns a new golly struct appropriately configured.
+// New returns a new golly struct configured with a default
+// retry handler of RetryWithBackoff. The golly functions will automatically
+// call New() for you, so there's no necessity to use New() yourself for
+// basic golly usage.
 func New() *Golly {
 	return &Golly{
-		waitH: RetryWithBackoff,
+		retryH: RetryWithBackoff,
 	}
 }
 
+// Panic creates a new Golly struct, and configures the panic handler.
 func Panic(p func(interface{}) error) *Golly {
 	return New().Panic(p)
 }
+
+// Retry creates a new Golly struct, and configures the retry handler.
 func Retry(p func(int, error, time.Duration) (time.Duration, error)) *Golly {
 	return New().Retry(p)
 }
+
+// Run creates a new Golly struct and runs the function with the
+// golly default golly RetryWithBackoff error handling.
 func Run(f func() error) error {
 	return New().Run(f)
 }
 
+// Panic sets the panic handler on the Golly struct. The panic handler
+// will be called if the function that is Run panics. If the panic
+// handler returns an error, golly's wait handler will receive the
+// error and handle it as it would any other error.
 func (g *Golly) Panic(p func(interface{}) error) *Golly {
 	g.panicH = p
 	return g
 }
 
+// Retry sets the retry handler. The retry handler determines whether golly
+// should retry the Run function, or exit with an error. If the retry handler
+// returns an error, golly's Run method returns the error. If it returns a nil
+// error and a time.Duration, golly will wait for the duration, then retry the
+// function.
 func (g *Golly) Retry(wait func(count int, err error, dur time.Duration) (time.Duration, error)) *Golly {
-	g.waitH = wait
+	g.retryH = wait
 	return g
 }
 
+// Run gives golly the function that is to be executed with golly error
+// handling. If the function returns an error, golly's retry handler determines
+// whether to retry the function, or to return an error.
 func (g *Golly) Run(f func() error) (err error) {
 	r := func() error {
 		if nil != g.panicH {
@@ -57,10 +78,10 @@ func (g *Golly) Run(f func() error) (err error) {
 			return nil
 		}
 		g.failCount++
-		if nil == g.waitH {
+		if nil == g.retryH {
 			return err
 		}
-		g.failWait, err = g.waitH(g.failCount, err, g.failWait)
+		g.failWait, err = g.retryH(g.failCount, err, g.failWait)
 		if nil != err {
 			return err
 		}

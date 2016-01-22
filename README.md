@@ -3,7 +3,7 @@ A transient error handling library for Go, like Polly. But for Go.
 
 # Usage
 
-golly is really simple, and short. It's a convenience, and there's no reason not to look at the code to see how it works. The most basic example, that connects to a MySQL server:
+Golly is really simple, and short. It's a convenience, and there's no reason not to look at the code to see how it works. The most basic example, that connects to a MySQL server:
 
 	var err error
 	var db *sql.DB
@@ -20,23 +20,6 @@ golly is really simple, and short. It's a convenience, and there's no reason not
 
 This example will attempt to connect to the mysql server, and ping the server to ensure it's working. If there is an error, golly will retry the function indefinitely, first with a 1 second pause, then 2, 4, 8, 16 and 32s pauses until success.
 
-# Methods or Functions
-
-Golly uses a struct to configure the handlers and keep track of the failures on a function call. You can create this struct with the `golly.New()` function call. There are also proxy functions in golly that will automactically call golly.New() for you, so in practice you don't need to use golly.New() at all.
-
-# Golly Methods / Functions
-
-Golly has four methods:
-
-## New() *Golly
-Returns a new Golly structure. Because golly defines a function for every 'method', you should never need to use the New() function at all. Any other function will automatically call a `New()` internally.
-
-## Retry(func (int,error,time.Duration) (time.Duration,error)) *Golly
-Retry sets a Retry handler for the Golly struct. The retry handler returns 
-
-## Panic(func (interface{}) error) *Golly
-Panic sets a panic handler. The panic handler can convert any panic to an error, to permit golly to do retries on panics as well as errors. By default, golly doesn't handle panics, and if you were to throw a panic from the panic handler, golly would not recover from the panic.
-
 # Retrying
 
 Golly catches errors and handles retries through a retry handler. This is a function of the form:
@@ -48,6 +31,25 @@ The retry handler returns the `time.Duration` that golly should wait before retr
 You set the retry handle with the Retry() method/function.
 
 By default, Golly uses the `golly.RetryWithBackoff` function defined in `presets.go`. It's really simple, and does the 2, 4, 8, 16 and 32s pauses.
+
+# Methods or Functions
+
+Golly uses a struct to configure handlers and keep track of the failures on a function call. You can create this struct with the `golly.New()` function call. There are proxy functions in golly that automatically call golly.New() for you, so in practice you don't need golly.New() at all.
+
+# Golly Methods / Functions
+
+Golly has four methods:
+
+## New() *Golly
+Returns a new Golly structure. Because golly defines a function for every 'method', you should never need to use the New(). The other golly functions automatically call a `New()` for you.
+
+## Retry(func (int,error,time.Duration) (time.Duration,error)) *Golly
+Retry sets a Retry handler for the Golly struct. The retry handler returns determines whether to return an error, or retry after the returned duration has passed.
+
+## Panic(func (interface{}) error) *Golly
+Panic sets a panic handler. The panic handler can convert any panic to an error, to permit golly to do retries on panics as well as errors. By default, golly doesn't handle panics. If you don't have a panic handler, of i you throw a panic from the panic handler, golly would exit with the panic.
+
+
 
 
 
