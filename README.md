@@ -47,7 +47,7 @@ Returns a new Golly structure. Because golly defines a function for every 'metho
 Retry sets a Retry handler for the Golly struct. The retry handler returns determines whether to return an error, or retry after the returned duration has passed.
 
 ## Panic(func (interface{}) error) *Golly
-Panic sets a panic handler. The panic handler can convert any panic to an error, to permit golly to do retries on panics as well as errors. By default, golly doesn't handle panics. If you don't have a panic handler, of i you throw a panic from the panic handler, golly would exit with the panic.
+Panic sets a panic handler. The panic handler can convert any panic to an error, to permit golly to do retries on panics as well as errors. By default, golly doesn't handle panics. If you don't have a panic handler, of if you throw a panic from the panic handler, golly would exit with the panic.
 
 
 
