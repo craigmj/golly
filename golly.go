@@ -47,7 +47,7 @@ func DbOpen(driverName, datasourceName string) (*sql.DB, error) {
 	var db *sql.DB
 	var err error
 	if err := Run(func() error {
-		db, err = db.Open(driverName, datasourceName)
+		db, err = sql.Open(driverName, datasourceName)
 		if nil != err {
 			return err
 		}
