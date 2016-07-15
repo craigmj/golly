@@ -1,6 +1,7 @@
 package golly
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -36,6 +37,25 @@ func Retry(p func(error, int, time.Duration) (time.Duration, error)) *Golly {
 // golly default golly RetryWithBackoff error handling.
 func Run(f func() error) error {
 	return New().Run(f)
+}
+
+// DbOpen is a utility method that connects to a Database, and Ping's the
+// database, permitting really easy data connection. It runs a standard
+// golly.Run function to ensure that the connection MUST succeed
+// before this function will return.
+func DbOpen(driverName, datasourceName string) (*sql.DB, error) {
+	var db *sql.DB
+	var err error
+	if err := Run(func() error {
+		db, err = db.Open(driverName, datasourceName)
+		if nil != err {
+			return err
+		}
+		return db.Ping()
+	}); nil != err {
+		return nil, err
+	}
+	return db, nil
 }
 
 // Panic sets the panic handler on the Golly struct. The panic handler

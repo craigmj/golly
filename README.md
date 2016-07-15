@@ -20,6 +20,10 @@ Golly is really simple, and short. It's a convenience, and there's no reason not
 
 This example will attempt to connect to the mysql server, and ping the server to ensure it's working. If there is an error, golly will retry the function indefinitely, first with a 1 second pause, then 2, 4, 8, 16 and 32s pauses until success.
 
+This example is encapsulated in the golly.DbOpen function. So you can simplify this code to:
+
+	db, err := golly.DbOpen("mysql", "[connection parameters]")
+
 # Retrying
 
 Golly catches errors and handles retries through a retry handler. This is a function of the form:
