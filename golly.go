@@ -51,7 +51,11 @@ func DbOpen(driverName, datasourceName string) (*sql.DB, error) {
 		if nil != err {
 			return err
 		}
-		return db.Ping()
+		if err = db.Ping(); nil != err {
+			db.Close()
+			return err
+		}
+		return nil
 	}); nil != err {
 		return nil, err
 	}
