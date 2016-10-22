@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// Set ErrorLog to report errors to your logging system
+var ErrorLog func(err error)
+
 type Golly struct {
 	panicH func(interface{}) error
 	retryH func(error, int, time.Duration) (time.Duration, error)
@@ -49,10 +52,16 @@ func DbOpen(driverName, datasourceName string) (*sql.DB, error) {
 	if err := Run(func() error {
 		db, err = sql.Open(driverName, datasourceName)
 		if nil != err {
+			if nil != ErrorLog {
+				ErrorLog(err)
+			}
 			return err
 		}
 		if err = db.Ping(); nil != err {
 			db.Close()
+			if nil != err && nil != ErrorLog {
+				ErrorLog(err)
+			}
 			return err
 		}
 		return nil
