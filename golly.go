@@ -3,6 +3,8 @@ package golly
 import (
 	"database/sql"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 // Set ErrorLog to report errors to your logging system
