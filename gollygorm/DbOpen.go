@@ -3,7 +3,7 @@ package gollygorm
 import (
 	"github.com/jinzhu/gorm"
 
-	"../golly"
+	"github.com/craigmj/golly"
 )
 
 // DbOpen is identical to golly.DbOpen, but returns a gorm database connection instead.
