@@ -18,7 +18,7 @@ func DbOpen(driverName, datasourceName string) (*gorm.DB, error) {
 			}
 			return err
 		}
-		if err = db.Ping(); nil != err {
+		if err = db.DB()Ping(); nil != err {
 			db.Close()
 			if nil != err && nil != golly.ErrorLog {
 				golly.ErrorLog(err)
