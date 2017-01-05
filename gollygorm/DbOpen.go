@@ -13,14 +13,14 @@ func DbOpen(driverName, datasourceName string) (*gorm.DB, error) {
 	if err := golly.Run(func() error {
 		db, err = gorm.Open(driverName, datasourceName)
 		if nil != err {
-			if nil != ErrorLog {
+			if nil != golly.ErrorLog {
 				golly.ErrorLog(err)
 			}
 			return err
 		}
 		if err = db.Ping(); nil != err {
 			db.Close()
-			if nil != err && nil != ErrorLog {
+			if nil != err && nil != golly.ErrorLog {
 				golly.ErrorLog(err)
 			}
 			return err
