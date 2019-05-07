@@ -53,8 +53,13 @@ Retry sets a Retry handler for the Golly struct. The retry handler returns deter
 ## Panic(func (interface{}) error) *Golly
 Panic sets a panic handler. The panic handler can convert any panic to an error, to permit golly to do retries on panics as well as errors. By default, golly doesn't handle panics. If you don't have a panic handler, of if you throw a panic from the panic handler, golly would exit with the panic.
 
+# Logging Errors
 
+If the `golly.ErrorLog` var is set, golly will report all errors it encounters while trying to connect to the database to this function. This can be useful, since if your database connection string is faulty, your application can appear to be frozen awaiting a database connection.
 
+To use this, just set the `ErrorLog` var to your own `func (err error)` implementation:
+
+    golly.ErrorLog = func(err error) { fmt.Fprintln(os.Stderr, err.Error()) }
 
 
 
